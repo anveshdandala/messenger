@@ -1,0 +1,89 @@
+.messenger-container {
+  display: flex;
+  flex-direction: column; /* default for mobile */
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(210, 232, 252);
+}
+
+@media (min-width: 768px) {
+  .messenger-container {
+    flex-direction: row;
+  }
+}
+
+.messenger-content {
+  flex: 1;
+  background: #f5f5f5;
+}
+
+.sidebar-container {
+  flex-shrink: 0; /* prevents shrinking */
+  width: 70px; /* fixed width instead of percentage */
+  max-width: 90px;
+  min-width: 60px;
+  height: 100vh;
+  background-color: rgb(0, 0, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-box {
+  margin-top: 5px;
+  width: 80%;
+  aspect-ratio: 1 / 1;
+  min-width: 55px;
+  min-height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  border-radius: 50%;
+  transition: border-radius 0.3s ease-in-out;
+}
+@media (min-width: 768px) {
+  .profile-box {
+    border-radius: 25%;
+  }
+}
+.profile-icon {
+  width: 60%;
+}
+.friends-list-container {
+  display: flex;
+  max-width: 200px;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  min-width: 100px;
+  background: #444; /* optional for visibility */
+}
+.no-friends {
+  margin-top: 0px;
+  color: white;
+  background-color: #b4daf7;
+  text-align: center;
+  margin-top: 20px;
+}
+.send-cont {
+  gap: 10px;
+}
+.send-cont input {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 8px;
+  width: 150px;
+  height: 35px;
+}
+.send-cont input:focus {
+  border: 1px solid #9cbbfd;
+  outline: none;
+}
+.send-request-btn {
+  background-color: #2563eb;
+  width: 70px;
+  height: 35px;
+  border-radius: 5px;
+}
