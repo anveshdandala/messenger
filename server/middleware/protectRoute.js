@@ -5,7 +5,6 @@ import User from "../models/user.model.js"; // adjust path
 const protectRoute = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    console.log("Authorization header:", authHeader);
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res

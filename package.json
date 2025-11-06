@@ -4,18 +4,19 @@
   "description": "messenger application ",
   "license": "ISC",
   "author": "",
+  "private": true,
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "setup": "npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"yellow.bold,cyan.bold\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && nodemon index.js",
+    "dev:client": "cd client && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^17.0.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.14.1",
-    "nodemon": "^3.1.10",
-    "sequelize": "^6.37.7"
+    "motion": "^12.23.24",
+    "nodemon": "^3.1.10"
   }
 }

@@ -67,8 +67,7 @@ export const respondToRequest = async (req, res) => {
 export const getFriends = async (req, res) => {
   try {
     const userId = req.user.userId;
-    console.log("userId:", userId);
-
+    console.log("fetching available friends for user:", userId);
     const friends = await Friend.findAll({
       where: {
         status: "accepted",
@@ -88,9 +87,49 @@ export const getFriends = async (req, res) => {
       ],
     });
 
-    res.json(friends);
+    const plainFriends = friends.map((f) => ({
+      id: f.id,
+      requesterId: f.requesterId,
+      receiverId: f.receiverId,
+      status: f.status,
+      createdAt: f.createdAt,
+      requester: f.Requester.dataValues,
+      receiver: f.Receiver.dataValues,
+    }));
+    console.log("friends of user", userId, ":", plainFriends);
+    res.json(plainFriends);
   } catch (err) {
     console.error("getFriends error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getRequestNotifications = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const requests = await Friend.findAll({
+      where: {
+        receiverId: userId,
+        status: "pending",
+      },
+      include: [
+        {
+          model: User,
+          as: "Requester",
+          attributes: ["userId", "fullname", "email"],
+        },
+        {
+          model: User,
+          as: "Receiver",
+          attributes: ["userId", "fullname", "email"],
+        },
+      ],
+    });
+
+    res.json({ requests });
+  } catch (err) {
+    console.error("getRequestNotifications error:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
