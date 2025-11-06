@@ -6,7 +6,7 @@ A full-stack messaging app with React + Express + MySQL.
 
 1. **Clone the repo:**
    ```bash
-   git clone https://github.com/yourusername/messenger.git
+   git clone https://github.com/anveshdandala/messenger.git
    cd messenger
    ```
 2. **Install all dependencies :**
