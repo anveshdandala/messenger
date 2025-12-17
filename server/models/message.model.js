@@ -1,4 +1,3 @@
-import { tr } from "motion/react-client";
 import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
 
