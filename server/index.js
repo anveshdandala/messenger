@@ -6,7 +6,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import swaggerUi from "swagger-ui-express";
 import { Server } from "socket.io";
-import swaggerFile from "./swagger-output.json" with { type: "json" };
+// import swaggerFile from "./swagger-output.json" with { type: "json" };
 
 import sequelize from "./config/database.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -28,16 +28,12 @@ const io = new Server(server, {
   },
 });
 
-expressOasGenerator.init(app, {
-  writeToFile: true,
-  specOutputPath: "./openapi.json",
-});
 // Middleware
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 console.log("✅ Swagger docs available at: http://localhost:5000/api-docs");
 
 // Socket authentication
@@ -96,7 +92,7 @@ io.on("connection", (socket) => {
       io.to(`user:${currentUserId}`).emit("receive_message", messageWithUsers);
       io.to(`user:${Number(receiverId)}`).emit(
         "receive_message",
-        messageWithUsers
+        messageWithUsers,
       );
     } catch (error) {
       console.error("Error sending socket message:", error);
@@ -115,6 +111,8 @@ app.use("/api/user", userRoutes);
 app.use("/api/friends", friendsRouts);
 app.use("/api/messages", messagesRoutes);
 console.log("api route setup done");
+
+// (initialization moved to server.listen callback below)
 
 // Connect to MySQL database
 sequelize
@@ -141,4 +139,10 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+
+  // initialize OpenAPI generator after server is listening
+  expressOasGenerator.init(app, {
+    writeToFile: true,
+    specOutputPath: "./openapi.json",
+  });
 });
