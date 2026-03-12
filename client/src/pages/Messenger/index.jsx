@@ -6,29 +6,29 @@ import { Route, Routes } from "react-router-dom";
 
 const Messenger = () => {
   return (
-    <div className="messenger-container">
+    <div className="flex h-screen w-screen bg-[var(--bg-primary)] overflow-hidden">
       <SideBar />
       <FriendsList />
-      <Routes>
-        <Route
-          index
-          element={
-            <div className="flex h-full w-2/3 items-center justify-center bg-black border-l border-slate-700">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-semibold text-white">
-                    Select a chat to start messaging
+      <div className="flex-1 flex flex-col h-full bg-[var(--bg-primary)]">
+        <Routes>
+          <Route
+            index
+            element={
+              <div className="flex flex-col h-full items-center justify-center text-[var(--text-secondary)]">
+                <div className="bg-[var(--bg-secondary)] p-8 rounded-2xl shadow-lg border border-[var(--border-color)] text-center max-w-md">
+                   <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+                    Welcome to Messenger
                   </h2>
-                  <p className="text-sm text-zinc-500">
-                    Choose a conversation from the sidebar to begin
+                  <p>
+                    Select a conversation from the sidebar to start chatting.
                   </p>
                 </div>
               </div>
-            </div>
-          }
-        />
-        <Route path="chat/:friendId" element={<TextingArea />} />
-      </Routes>
+            }
+          />
+          <Route path="chat/:friendId" element={<TextingArea />} />
+        </Routes>
+      </div>
     </div>
   );
 };

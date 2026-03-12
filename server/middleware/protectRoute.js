@@ -21,7 +21,7 @@ const protectRoute = async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(token, "mysupersecretkey");
+      decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key");
     } catch (verifyErr) {
       console.error("JWT verify error:", verifyErr);
       return res.status(401).json({ error: "Token invalid or expired" });

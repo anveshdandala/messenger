@@ -30,3 +30,41 @@ export const loginUser = async (email, password) => {
     },
   };
 };
+
+export const signupUser =  async ( fullname, username, email, password, phone, confirmPassword)=>{
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    throw new Error("User with this email already exists"); 
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const newUser = await User.create({
+    fullname,
+    username,
+    email,
+    phone,
+    password: hashedPassword,
+  });
+
+  if (newUser) {
+    const token = jwt.sign(
+      { id: newUser.userId, email: newUser.email },
+      process.env.JWT_SECRET || "fallback_secret_key", 
+      { expiresIn: "24h" }
+    );
+
+    return {
+      token,
+      user: {
+        id: newUser.userId,
+        email: newUser.email,
+        fullname: newUser.fullname,
+      },
+    };
+
+  } else {
+    throw new Error("Invalid user data");
+  }
+};

@@ -27,6 +27,7 @@ export const login = async (req, res) => {
 
 export const signup = async (req, res) => {
   try {
+    console.log("signup called with req",req.body);
     const { fullname, username, email, password, phone, confirmPassword } =
       req.body;
 
@@ -39,34 +40,11 @@ export const signup = async (req, res) => {
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match" });
     }
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res
-        .status(409)
-        .json({ error: "User with this email already exists" });
-    }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const result = await authService.signupUser(fullname, username, email, password, phone, confirmPassword);
 
-    const newUser = await User.create({
-      fullname,
-      username,
-      email,
-      phone,
-      password: hashedPassword,
-    });
-
-    if (newUser) {
-      res.status(201).json({
-        id: newUser.userId,
-        fullname: newUser.fullname,
-        username: newUser.username,
-        email: newUser.email,
-      });
-    } else {
-      res.status(400).json({ error: "Invalid user data" });
-    }
+    res.status(201).json(result);
+    
   } catch (error) {
     console.error("Error in signup controller: ", error.message);
     res.status(500).json({ error: "Internal Server Error" });

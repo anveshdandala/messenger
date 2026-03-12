@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserPlus } from "lucide-react";
-import AnimatedList from "../components/AnimatedList.js";
+import { UserPlus, Bell, X, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const FriendsList = () => {
@@ -45,7 +44,13 @@ const FriendsList = () => {
         });
         const data = await response.json();
         console.log("friend requests notifications:", data);
-        setFriendRequests(data.requests);
+        if (data.requests) {
+           setFriendRequests(data.requests);
+        } else if (Array.isArray(data)) {
+           setFriendRequests(data);
+        } else {
+           setFriendRequests([]);
+        }
       } catch (error) {
         console.error("Error fetching friend requests:", error);
       }
@@ -112,101 +117,94 @@ const FriendsList = () => {
     }
   };
 
-  const clickedFriend = (friendId) => {
-    console.log("opening chat with friend id :", friendId);
-
-    localStorage.setItem("selectedFriendId", friendId);
-    window.history.pushState({}, "", `/chat/${friendId}`);
-
-    // optional: notify any in-app listeners
-    window.dispatchEvent(
-      new CustomEvent("friendSelected", { detail: { friendId } })
-    );
-  };
 
   const EmptyState = () => (
-    <div className="empty-state-container flex flex-col h-full">
-      <div className="flex flex-col items-center justify-center h-full px-6 py-12">
-        <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-          <UserPlus className="w-12 h-12 text-slate-400" />
-        </div>
-        <h3 className="text-xl font-semibold text-slate-200 mb-2">
-          No friends yet
-        </h3>
-        <p className="text-slate-400 text-center mb-6 max-w-xs">
-          Start building your network by inviting friends to join the
-          conversation.
-        </p>
-        <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center space-x-2"
-          onClick={() => setShowRequest(true)}
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Invite Friends</span>
-        </button>
-
-        {showRequest && (
-          <div className="mt-4 flex flex-row items-center space-x-2">
-            <input
-              type="text"
-              placeholder="Enter friend's email"
-              value={requestedEmail}
-              onChange={(e) => setRequestedEmail(e.target.value)}
-              className="px-3 py-2 border rounded-lg text-black"
-            />
-            <button
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-              onClick={handleSendRequest}
-            >
-              Send
-            </button>
-          </div>
-        )}
-        {message && <p className="text-sm text-green-400 mt-2">{message}</p>}
+    <div className="flex flex-col items-center justify-center h-64 px-6 text-center">
+      <div className="w-16 h-16 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mb-4 text-[var(--text-tertiary)]">
+        <UserPlus size={24} />
       </div>
+      <h3 className="text-lg font-medium text-[var(--text-primary)] mb-2">
+        No friends yet
+      </h3>
+      <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-[200px]">
+        Build your network by inviting friends.
+      </p>
+      <button
+        className="bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white px-5 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
+        onClick={() => setShowRequest(true)}
+      >
+        <UserPlus size={16} />
+        <span>Invite Friends</span>
+      </button>
+
+      {showRequest && (
+        <div className="mt-4 w-full flex flex-col gap-2">
+          <input
+            type="text"
+            placeholder="Enter friend's email"
+            value={requestedEmail}
+            onChange={(e) => setRequestedEmail(e.target.value)}
+            className="w-full px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--accent-primary)]"
+          />
+          <button
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
+            onClick={handleSendRequest}
+          >
+            Send
+          </button>
+        </div>
+      )}
+      {message && <p className="text-xs text-green-400 mt-2">{message}</p>}
     </div>
   );
 
   return (
-    <>
-      <div className="w-1/3 bg-black border-l border-gray-700 flex flex-col h-full relative text-white">
-        <div className="friends-header flex items-center justify-between px-4 py-3 border-b border-slate-700">
-          <h2 className="text-lg font-semibold">Friends</h2>
+    <div className="w-80 h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col">
+      {/* Header */}
+      <div className="h-[72px] px-6 flex items-center justify-between border-b border-[var(--border-color)]">
+        <h2 className="text-xl font-bold text-[var(--text-primary)]">Friends</h2>
+        <button
+          className="relative p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors"
+          onClick={() => setNotification(!notification)}
+        >
+          <Bell size={20} />
+          {friendRequests.length > 0 && (
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[var(--bg-secondary)]" />
+          )}
+        </button>
+      </div>
 
-          <button
-            className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg flex items-center justify-center"
-            onClick={() => setNotification(!notification)}
-          >
-            ☰
-          </button>
-        </div>
-
-        {/* Notifications Dropdown */}
-        {notification && (
-          <div className="absolute top-12 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-10 w-72">
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-lg font-semibold">Friend Requests</h4>
-                <button onClick={() => setNotification(false)}>x</button>
-              </div>
+       {/* Notifications Dropdown */}
+       {notification && (
+          <div className="absolute top-[70px] left-20 z-50 w-72 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-secondary)]">
+              <h4 className="font-semibold text-[var(--text-primary)]">Fried Requests</h4>
+              <button 
+                onClick={() => setNotification(false)}
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="max-h-64 overflow-y-auto">
               {friendRequests.length > 0 ? (
                 friendRequests.map((req) => (
-                  <div
-                    key={req.id}
-                    className="bg-gray-700 p-3 my-1 rounded-md flex flex-col"
-                  >
-                    <p className="text-sm">
-                      {req.Requester.fullname} ({req.Requester.email})
+                  <div key={req.id} className="p-3 border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--bg-primary)] transition-colors">
+                    <p className="text-sm font-medium text-[var(--text-primary)] mb-1">
+                      {req.Requester.fullname}
                     </p>
-                    <div className="flex gap-2 mt-2">
+                    <p className="text-xs text-[var(--text-secondary)] mb-3">
+                      {req.Requester.email}
+                    </p>
+                    <div className="flex gap-2">
                       <button
-                        className="bg-green-600 px-3 py-1 rounded"
+                        className="flex-1 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1"
                         onClick={() => respondToRequest(req.id, "accepted")}
                       >
-                        Accept
+                         <Check size={14} /> Accept
                       </button>
                       <button
-                        className="bg-red-600 px-3 py-1 rounded"
+                        className="flex-1 bg-[var(--bg-tertiary)] hover:bg-red-900/50 text-[var(--text-secondary)] hover:text-red-400 py-1.5 rounded-lg text-xs font-medium"
                         onClick={() => respondToRequest(req.id, "rejected")}
                       >
                         Reject
@@ -215,41 +213,49 @@ const FriendsList = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-400">No new friend requests</p>
+                <div className="p-8 text-center text-[var(--text-secondary)] text-sm">
+                  No new requests
+                </div>
               )}
             </div>
           </div>
         )}
 
-        {/* Friends Section */}
-        <div className="flex-1 overflow-y-auto">
-          {friends.length > 0 ? (
-            friends.map((f) => {
-              const friendUser =
-                f.requesterId === currentUserId ? f.receiver : f.requester;
-              return (
-                <div
-                  onClick={() =>
-                    navigate(`/messenger/chat/${friendUser.userId}`)
-                  }
-                  className="cursor-pointer"
-                >
-                  <AnimatedList
-                    items={[`${friendUser.fullname} (${friendUser.email})`]}
-                    onItemSelect={(item, index) => console.log(item, index)}
-                    showGradients={true}
-                    enableArrowNavigation={true}
-                    displayScrollbar={true}
-                  />
+      {/* Friends List */}
+      <div className="flex-1 overflow-y-auto p-2">
+        {friends.length > 0 ? (
+          friends.map((f) => {
+             const isRequester = f.requesterId === currentUserId;
+              const friendUser = isRequester ? f.receiver : f.requester;
+            if (!friendUser) return null;
+            
+            return (
+              <div
+                key={f.id}
+                onClick={() => navigate(`/messenger/chat/${friendUser.userId}`)}
+                className="group p-3 mb-1 rounded-xl cursor-pointer hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    {friendUser.fullname[0]}
+                  </div>
+                  <div className="overflow-hidden">
+                    <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate group-hover:text-white transition-colors">
+                      {friendUser.fullname}
+                    </h4>
+                    <p className="text-xs text-[var(--text-secondary)] truncate">
+                      {friendUser.email}
+                    </p>
+                  </div>
                 </div>
-              );
-            })
-          ) : (
-            <EmptyState />
-          )}
-        </div>
+              </div>
+            );
+          })
+        ) : (
+          <EmptyState />
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

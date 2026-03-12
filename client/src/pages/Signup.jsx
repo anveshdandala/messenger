@@ -84,6 +84,7 @@ export default function SignupPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       console.log("Signup successful! Server response:", data);
+      localStorage.setItem("user-own-profile", data.token);
       navigate("/messenger");
     } catch (e) {
       // 3. The catch block will now log the REAL error message from the server
